@@ -8,7 +8,7 @@
 package routers
 
 import (
-	"github.com/goapi/controllers"
+	"github.com/kykl/goapi/controllers"
 
 	"github.com/astaxie/beego"
 )

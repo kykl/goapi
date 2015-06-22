@@ -1,8 +1,8 @@
 package main
 
 import (
-	_ "github.com/goapi/docs"
-	_ "github.com/goapi/routers"
+	_ "github.com/kykl/goapi/docs"
+	_ "github.com/kykl/goapi/routers"
 
 	"github.com/astaxie/beego"
 )

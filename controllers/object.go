@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"github.com/goapi/models"
+	"github.com/kykl/goapi/models"
 	"encoding/json"
 
 	"github.com/astaxie/beego"
