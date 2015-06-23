@@ -6,6 +6,27 @@ import (
 
 func init() {
 
+	beego.GlobalControllerRouter["github.com/kykl/goapi/controllers:EventController"] = append(beego.GlobalControllerRouter["github.com/kykl/goapi/controllers:EventController"],
+		beego.ControllerComments{
+			"Post",
+			`/`,
+			[]string{"post"},
+			nil})
+
+	beego.GlobalControllerRouter["github.com/kykl/goapi/controllers:EventController"] = append(beego.GlobalControllerRouter["github.com/kykl/goapi/controllers:EventController"],
+		beego.ControllerComments{
+			"Get",
+			`/:EventId`,
+			[]string{"get"},
+			nil})
+
+	beego.GlobalControllerRouter["github.com/kykl/goapi/controllers:EventController"] = append(beego.GlobalControllerRouter["github.com/kykl/goapi/controllers:EventController"],
+		beego.ControllerComments{
+			"GetAll",
+			`/`,
+			[]string{"get"},
+			nil})
+
 	beego.GlobalControllerRouter["github.com/kykl/goapi/controllers:ObjectController"] = append(beego.GlobalControllerRouter["github.com/kykl/goapi/controllers:ObjectController"],
 		beego.ControllerComments{
 			"Post",

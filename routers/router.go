@@ -25,6 +25,11 @@ func init() {
 				&controllers.UserController{},
 			),
 		),
+		beego.NSNamespace("/event",
+			beego.NSInclude(
+				&controllers.EventController{},
+			),
+		),
 	)
 	beego.AddNamespace(ns)
 }
