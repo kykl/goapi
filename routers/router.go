@@ -9,11 +9,11 @@ package routers
 
 import (
 	"github.com/kykl/goapi/controllers"
-
 	"github.com/astaxie/beego"
 )
 
 func init() {
+
 	ns := beego.NewNamespace("/v1",
 		beego.NSNamespace("/object",
 			beego.NSInclude(

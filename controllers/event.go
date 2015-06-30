@@ -2,15 +2,18 @@ package controllers
 
 import (
 	"github.com/kykl/goapi/models"
+	"github.com/kykl/goapi/service"
 	"encoding/json"
 
-	"github.com/astaxie/beego"
+	"fmt"
 )
 
 // Operations about Event
 type EventController struct {
-	beego.Controller
+	InjectableController
+	Logger service.Logger `inject:""`
 }
+
 
 // @Title create
 // @Description create Event
@@ -21,8 +24,12 @@ type EventController struct {
 func (o *EventController) Post() {
 	var ob models.Event
 	json.Unmarshal(o.Ctx.Input.RequestBody, &ob)
-	Eventid := models.AddOneEvent(ob)
-	o.Data["json"] = map[string]string{"EventId": Eventid}
+	models.AddOneEvent(&ob)
+	id, err := o.Logger.Log(ob)
+	if err != nil {
+		fmt.Printf("Post error: %s\n", err.Error())
+	}
+	o.Data["json"] = map[string]string{"EventId": id}
 	o.ServeJson()
 }
 
@@ -39,6 +46,7 @@ func (o *EventController) Get() {
 		if err != nil {
 			o.Data["json"] = err
 		} else {
+			o.Logger.Log(*ob)
 			o.Data["json"] = ob
 		}
 	}

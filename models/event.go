@@ -36,12 +36,12 @@ func init() {
 	}
 }
 
-func AddOneEvent(event Event) (EventId string) {
+func AddOneEvent(event *Event) (EventId string) {
 	if event.Id == "" {
 		event.Id = uuid.New()
 	}
 	//event.Id = "astaxie" + strconv.FormatInt(time.Now().UnixNano(), 10)
-	Events[event.Id] = &event
+	Events[event.Id] = event
 	return event.Id
 }
 
