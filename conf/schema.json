@@ -1,0 +1,7 @@
+[
+  { "name": "id", "type": "STRING" },
+  { "name": "type", "type": "STRING" },
+  { "name": "createdAt", "type": "TIMESTAMP" },
+  { "name": "collectedAt", "type": "TIMESTAMP" },
+  { "name": "json", "type": "STRING" }
+]

@@ -3,58 +3,56 @@ package service
 import (
 	"github.com/kykl/goapi/models"
 	"encoding/json"
-	"encoding/base64"
+	//"encoding/base64"
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 	"google.golang.org/cloud"
-	_ "google.golang.org/cloud/compute/metadata"
+	"google.golang.org/cloud/compute/metadata"
 	"google.golang.org/cloud/pubsub"
 	"net/http"
 	"io/ioutil"
 	"errors"
 	"log"
-	"fmt"
+	"github.com/astaxie/beego"
 )
 
 type GooglePubSubLogger struct {
 	ctx context.Context
+	topics map[string]bool
 }
 
-var jsonFile = "/Users/kykl/Downloads/goapi-464d98feb1e7.json"
-var projectId = "goapi-991"
-
-func NewContext() context.Context {
-	client, err := NewClient(jsonFile)
-	if err != nil {
-		log.Fatalf("clientAndId failed, %v", err)
+func NewGooglePubSubLogger() *GooglePubSubLogger {
+	if logger == nil {
+		logger = &GooglePubSubLogger{}
+		logger.topics = map[string]bool{}
+		logger.createContext()
 	}
-	return cloud.NewContext(projectId, client)
-}
 
-func (this *GooglePubSubLogger) Context() (context.Context, error) {
-	if this.ctx == nil {
-		fmt.Printf("created new context")
-		client, err := NewClient(jsonFile)
-		if err != nil {
-			log.Fatalf("clientAndId failed, %v", err)
-			return nil, err
-		}
-		this.ctx = cloud.NewContext(projectId, client)
-	}
-	return this.ctx, nil
+	return logger
 }
 
 func (this *GooglePubSubLogger) Log(event models.Event) (id string, err error) {
+	if !this.topics[event.Type] {
+		// lookup and create the topic
+		hasTopic, err := pubsub.TopicExists(this.ctx, event.Type)
+		if err != nil {
+			return "", err
+		}
+		if !hasTopic {
+			if pubsub.CreateTopic(this.ctx, event.Type) != nil {
+				return "", err
+			}
+		}
+		this.topics[event.Type] = true
+	}
 	data, err := json.Marshal(event)
 	if err != nil {
 		return "", err
 	}
-	message := base64.StdEncoding.EncodeToString(data)
 
-	fmt.Printf("message: %s\n", message)
-	msgIds, err := pubsub.Publish(NewContext(), event.Type, &pubsub.Message{
-		Data: []byte(message),
+	msgIds, err := pubsub.Publish(this.ctx, event.Type, &pubsub.Message{
+		Data: []byte(data),
 	})
 
 	if err != nil {
@@ -62,6 +60,20 @@ func (this *GooglePubSubLogger) Log(event models.Event) (id string, err error) {
 	}
 
 	return msgIds[0], nil
+}
+
+func (this *GooglePubSubLogger) createContext() (context.Context, error) {
+	if this.ctx == nil {
+		jsonFile := beego.AppConfig.DefaultString("gcp.service.account.json", "goapi.json")
+		client, err := newClient(jsonFile)
+		if err != nil {
+			log.Fatalf("clientAndId failed, %v", err)
+			return nil, err
+		}
+		projectId := beego.AppConfig.DefaultString("gcp.project.id", "goapi-991")
+		this.ctx = cloud.NewContext(projectId, client)
+	}
+	return this.ctx, nil
 }
 
 func(this *GooglePubSubLogger) publish(ctx context.Context, topic string, message string) (id string, err error) {
@@ -79,7 +91,7 @@ func(this *GooglePubSubLogger) publish(ctx context.Context, topic string, messag
 // newClient creates http.Client with a jwt service account when
 // jsonFile flag is specified, otherwise by obtaining the GCE service
 // account's access token.
-func NewClient(jsonFile string) (*http.Client, error) {
+func newClient(jsonFile string) (*http.Client, error) {
 	if jsonFile != "" {
 		jsonKey, err := ioutil.ReadFile(jsonFile)
 		if err != nil {
@@ -92,5 +104,22 @@ func NewClient(jsonFile string) (*http.Client, error) {
 		return conf.Client(oauth2.NoContext), nil
 	}
 
+	if metadata.OnGCE() {
+		c := &http.Client{
+			Transport: &oauth2.Transport{
+				Source: google.ComputeTokenSource(""),
+			},
+		}
+		/*if *projID == "" {
+			projectID, err := metadata.ProjectID()
+			if err != nil {
+				return nil, fmt.Errorf("ProjectID failed, %v", err)
+			}
+			*projID = projectID
+		}*/
+		return c, nil
+	}
 	return nil, errors.New("Could not create an authenticated client.")
 }
+
+var logger *GooglePubSubLogger
