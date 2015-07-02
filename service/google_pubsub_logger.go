@@ -2,8 +2,6 @@ package service
 
 import (
 	"github.com/kykl/goapi/models"
-	"encoding/json"
-	//"encoding/base64"
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
@@ -46,13 +44,11 @@ func (this *GooglePubSubLogger) Log(event models.Event) (id string, err error) {
 		}
 		this.topics[event.Type] = true
 	}
-	data, err := json.Marshal(event)
-	if err != nil {
-		return "", err
-	}
+
+	data := event.Bytes()
 
 	msgIds, err := pubsub.Publish(this.ctx, event.Type, &pubsub.Message{
-		Data: []byte(data),
+		Data: data,
 	})
 
 	if err != nil {

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"time"
 	"code.google.com/p/go-uuid/uuid"
+	"encoding/json"
 )
 
 var (
@@ -17,6 +18,31 @@ type Event struct {
 	CreatedAt time.Time
 	CollectedAt time.Time
 	Properties map[string]interface{}
+}
+
+func (this *Event) String() string {
+	return string(this.Bytes())
+}
+
+func (this *Event) Bytes() []byte {
+	props := map[string]interface{}{
+		"id":this.Id,
+		"type":this.Type,
+		"createdAt":this.CollectedAt,
+		"collectedAt":this.CollectedAt,
+	}
+	if len(this.Properties) > 0 {
+		js, err := json.Marshal(this.Properties)
+		if err == nil {
+			props["json"] = string(js)
+		}
+	}
+
+	js, err := json.Marshal(props)
+	if err != nil {
+		return  []byte("{}")
+	}
+	return js
 }
 
 func init() {

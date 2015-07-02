@@ -22,7 +22,8 @@ var TestingServices = DefaultServices
 
 var ProdServices = func() []interface{} {
 	return []interface{}{
-		service.NewGooglePubSubLogger(),
+		//service.NewGooglePubSubLogger(),
+		service.NewFileLogger("/var/log/goapi/event.log"),
 	}
 }
 var Services func() []interface{}
