@@ -31,23 +31,23 @@ func NewGooglePubSubLogger() *GooglePubSubLogger {
 }
 
 func (this *GooglePubSubLogger) Log(event models.Event) (id string, err error) {
-	if !this.topics[event.Type] {
+	if !this.topics[event.Name] {
 		// lookup and create the topic
-		hasTopic, err := pubsub.TopicExists(this.ctx, event.Type)
+		hasTopic, err := pubsub.TopicExists(this.ctx, event.Name)
 		if err != nil {
 			return "", err
 		}
 		if !hasTopic {
-			if pubsub.CreateTopic(this.ctx, event.Type) != nil {
+			if pubsub.CreateTopic(this.ctx, event.Name) != nil {
 				return "", err
 			}
 		}
-		this.topics[event.Type] = true
+		this.topics[event.Name] = true
 	}
 
 	data := event.Bytes()
 
-	msgIds, err := pubsub.Publish(this.ctx, event.Type, &pubsub.Message{
+	msgIds, err := pubsub.Publish(this.ctx, event.Name, &pubsub.Message{
 		Data: data,
 	})
 

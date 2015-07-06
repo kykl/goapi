@@ -14,9 +14,14 @@ var (
 
 type Event struct {
 	Id string
-	Type string
+	Name string
 	CreatedAt time.Time
 	CollectedAt time.Time
+	UserId string
+	SessionId string
+	Platform string
+	Language string
+	AppId string
 	Properties map[string]interface{}
 }
 
@@ -27,9 +32,14 @@ func (this *Event) String() string {
 func (this *Event) Bytes() []byte {
 	props := map[string]interface{}{
 		"id":this.Id,
-		"type":this.Type,
+		"name":this.Name,
 		"createdAt":this.CollectedAt,
 		"collectedAt":this.CollectedAt,
+		"userId":this.UserId,
+		"sessionId":this.SessionId,
+		"platform":this.Platform,
+		"language":this.Language,
+		"appId":this.AppId,
 	}
 	if len(this.Properties) > 0 {
 		js, err := json.Marshal(this.Properties)
@@ -49,16 +59,22 @@ func init() {
 	Events = make(map[string]*Event)
 	for i := 0; i < 10; i++ {
 		id := fmt.Sprintf("id%3d", i)
-		eventType := "log"
+		name := "log"
 		createdAt := time.Now()
 		collectedAt := time.Now()
+		userId := fmt.Sprintf("userId-%d", i)
+		sessionId := fmt.Sprintf("sessionId-%d", i)
+		platform := fmt.Sprintf("platform-%d", i)
+		language := fmt.Sprintf("language-%d", i)
+		appId := fmt.Sprintf("appId-%d", i)
+
 		properties := map[string]interface{} {
 			"int" : i,
 			"string" : fmt.Sprintf("string-%3d", i),
 			"time" : time.Now(),
 		}
 
-		Events[id] = &Event{id, eventType, createdAt, collectedAt, properties}
+		Events[id] = &Event{id, name, createdAt, collectedAt, userId, sessionId, platform, language, appId, properties}
 	}
 }
 

@@ -1,7 +1,12 @@
 [
   { "name": "id", "type": "STRING" },
-  { "name": "type", "type": "STRING" },
+  { "name": "name", "type": "STRING" },
   { "name": "createdAt", "type": "TIMESTAMP" },
   { "name": "collectedAt", "type": "TIMESTAMP" },
+  { "name": "userId", "type": "STRING" },
+  { "name": "sessionId", "type": "STRING" },
+  { "name": "platform", "type": "STRING" },
+  { "name": "language", "type": "STRING" },
+  { "name": "appId", "type": "STRING" },
   { "name": "json", "type": "STRING" }
 ]
