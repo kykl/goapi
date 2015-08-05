@@ -40,7 +40,7 @@ RUN curl -L https://raw.githubusercontent.com/kaizenplatform/fluent-plugin-bigqu
 #
 
 # fluentd agent runs as td-agent
-RUN chown td-agent:td-agent $APP_HOME/conf/randomidea-service-account.p12
+RUN chown td-agent:td-agent $APP_HOME/conf/devops-service-account.p12
 
 EXPOSE 8080
 ENTRYPOINT /etc/init.d/td-agent restart && $APP_HOME/goapi
